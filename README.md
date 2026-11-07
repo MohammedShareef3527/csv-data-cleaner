@@ -1,8 +1,42 @@
+<div align="center">
+
 # Data Cleaner
 
-A Python command-line tool that cleans messy CSV and Excel files and gives you a plain-English report of what it fixed. It is the kind of job small businesses constantly need: customer lists, sales sheets and enquiry logs full of typos, duplicates and inconsistent formats.
+**A Python command-line tool that cleans messy CSV and Excel files and explains every fix in a plain-English report.**
 
-## Before and after
+![Python](https://img.shields.io/badge/Python-0d1117?style=flat-square&logo=python&logoColor=3776AB)
+![pandas](https://img.shields.io/badge/pandas-0d1117?style=flat-square&logo=pandas&logoColor=E70488)
+![pytest](https://img.shields.io/badge/tests-15%20passing-3fb950?style=flat-square&logo=pytest&logoColor=white&labelColor=0d1117)
+
+</div>
+
+---
+
+## Overview
+
+Data Cleaner takes a messy spreadsheet (a customer list, sales sheet or enquiry log) and produces a clean copy: tidy column names, consistent dates, real numbers, standardised phone numbers and emails, and no duplicates. It also writes a report of what it changed and what still needs a human to check.
+
+## Problem Statement
+
+Small businesses constantly deal with spreadsheets full of typos, duplicates and inconsistent formats: the same customer typed twice in different capitalisation, dates in three formats, amounts written as `₹1,200` or `Rs. 2,500.50`. Cleaning this by hand is slow and error-prone, and silent "auto-fixes" can damage data. This tool fixes what it safely can and clearly flags the rest.
+
+## Features
+
+- **Column names** are tidied (`' Customer Name '` becomes `customer_name`)
+- **Extra spaces** are trimmed, and placeholders such as `N/A`, `null` and `--` become blank
+- **Empty rows and empty columns** are removed
+- **Dates** in mixed formats (`05/03/2024`, `2024-03-05`, `12-Mar-2024`, `March 20 2024`) all become `YYYY-MM-DD`
+- **Amounts** like `₹1,200`, `Rs. 2,500.50` and `(300)` become real numbers
+- **Phone numbers** lose spaces, symbols and the `+91` prefix
+- **Emails** are trimmed and lower-cased
+- **Names and cities** get consistent capitalisation
+- **Duplicates** are removed *after* everything is standardised, so `JOHN SMITH` with `05/03/2024` matches `john smith` with `2024-03-05`
+- **IDs and pincodes** with leading zeros stay as text, so `0560002` is never turned into `560002`
+- **CSV and Excel** input and output, with automatic handling of UTF-8 and Latin-1 files
+
+Problems it can't safely fix (invalid emails, bad phone numbers, unreadable dates) are listed under "Needs your attention" in the report instead of being silently changed.
+
+## Before and After
 
 `messy_customers.csv` (input):
 
@@ -28,24 +62,32 @@ Amit Kumar,amit@example.com,,2024-03-15,,Hubli,580020
 
 The full report is in [`cleaning_report.txt`](cleaning_report.txt).
 
-## What it fixes
+## Tech Stack
 
-- **Column names** are tidied (`' Customer Name '` becomes `customer_name`)
-- **Extra spaces** are trimmed, and placeholders such as `N/A`, `null` and `--` become blank
-- **Empty rows and empty columns** are removed
-- **Dates** in mixed formats (`05/03/2024`, `2024-03-05`, `12-Mar-2024`, `March 20 2024`) all become `YYYY-MM-DD`
-- **Amounts** like `₹1,200`, `Rs. 2,500.50` and `(300)` become real numbers
-- **Phone numbers** lose spaces, symbols and the `+91` prefix
-- **Emails** are trimmed and lower-cased
-- **Names and cities** get consistent capitalisation
-- **Duplicates** are removed *after* everything is standardised, so `JOHN SMITH` with `05/03/2024` matches `john smith` with `2024-03-05`
-- **IDs and pincodes** with leading zeros stay as text, so `0560002` is never turned into `560002`
+- **Language:** Python 3
+- **Data processing:** pandas
+- **Excel support:** openpyxl
+- **Testing:** pytest
+- **CLI:** argparse
 
-Problems it can't safely fix (invalid emails, bad phone numbers, unreadable dates) are listed under "Needs your attention" in the report instead of being silently changed.
+## Project Structure
 
-## How to run
+```text
+csv-data-cleaner/
+├── cleaner.py                    # the cleaning engine and command-line interface
+├── test_cleaner.py               # 15 automated tests
+├── messy_customers.csv           # sample messy input
+├── messy_customers_cleaned.csv   # output produced from the sample
+├── cleaning_report.txt           # report produced from the sample
+├── requirements.txt
+└── .gitignore
+```
+
+## Installation and Setup
 
 ```bash
+git clone https://github.com/MohammedShareef3527/csv-data-cleaner.git
+cd csv-data-cleaner
 pip install -r requirements.txt
 python cleaner.py messy_customers.csv
 ```
@@ -58,9 +100,19 @@ python cleaner.py sales.xlsx -o sales_clean.xlsx              # Excel in, Excel 
 python cleaner.py data.csv --us-dates                         # read 03/05/2024 as March 5
 ```
 
+## Configuration
+
+No API keys or settings files are needed. Behaviour is controlled with command-line options:
+
+| Option | Default | Meaning |
+|---|---|---|
+| `-o`, `--output` | `<input>_cleaned.csv` | output file; use `.xlsx` for Excel |
+| `--report` | not saved | also save the report to a text file |
+| `--us-dates` | off | read ambiguous dates as month/day/year |
+
 Ambiguous dates such as `05/03/2024` are read as day/month/year by default, which is the usual format in India.
 
-## How it works
+## How It Works
 
 1. `snake_columns()` renames columns, and `clean_text()` trims text and blanks out placeholders
 2. Empty rows and columns are dropped
@@ -68,18 +120,31 @@ Ambiguous dates such as `05/03/2024` are read as day/month/year by default, whic
 4. Duplicates are detected on the standardised values
 5. A report is generated from counters collected along the way
 
-## Run the tests
+## Run the Tests
 
 ```bash
 pytest
 ```
 
-## Tech Stack
+The 15 tests cover column renaming, placeholders, currency parsing, phone cleanup, date handling in both day-first and month-first modes, duplicate detection, leading-zero IDs, invalid emails, and full CSV and Excel round trips through the command line.
 
-Python 3, pandas, openpyxl, pytest
+## Future Improvements
 
-## Possible Future Improvements
+These are planned ideas, not current features:
 
 - Choose which columns to clean from the command line
 - Fill missing values (for example, with the column average)
 - A simple drag-and-drop web interface
+
+## Learning Outcomes
+
+- Data cleaning and type inference with pandas
+- Writing rules that are safe by default: convert only when most values match, and report instead of guessing
+- Handling real-world formats: Indian currency, phone numbers and day-first dates
+- Building a command-line tool with argparse
+- Test-driven development with pytest, including end-to-end CLI tests
+
+## Author
+
+**Mohammed Shamsul Qhadri Shareef**
+GitHub: [@MohammedShareef3527](https://github.com/MohammedShareef3527)
