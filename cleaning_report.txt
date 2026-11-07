@@ -1,0 +1,38 @@
+DATA CLEANING REPORT
+============================================
+Input file : messy_customers.csv
+Output file: messy_customers_cleaned.csv
+
+Rows    : 8 -> 5
+Columns : 7 -> 7
+
+Empty rows removed   : 1
+Duplicate rows removed: 2
+
+Column names tidied:
+  'Customer Name ' -> customer_name
+  ' E-mail' -> e_mail
+  'Phone' -> phone
+  'Join Date' -> join_date
+  'Amount Paid' -> amount_paid
+  'City' -> city
+  'Pincode' -> pincode
+
+What was fixed:
+  - 'customer_name': fixed capitalisation
+  - 'e_mail': trimmed and lower-cased emails
+  - 'phone': stripped spaces/symbols and +91 prefix from phone numbers
+  - 'join_date': converted mixed date formats to YYYY-MM-DD
+  - 'amount_paid': removed currency symbols/commas and converted to numbers
+  - 'city': fixed capitalisation
+
+Missing values left in the data:
+  - phone: 1
+  - join_date: 1
+  - amount_paid: 1
+  - city: 1
+
+Needs your attention:
+  ! 'e_mail': 1 value(s) do not look like valid emails (kept, please review)
+  ! 'phone': 1 value(s) are not valid 10-digit Indian mobile numbers (kept, please review)
+  ! 'join_date': 1 value(s) could not be read as dates (left blank)

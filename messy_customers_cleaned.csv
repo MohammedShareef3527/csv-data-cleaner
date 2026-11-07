@@ -1,0 +1,6 @@
+customer_name,e_mail,phone,join_date,amount_paid,city,pincode
+John Smith,john@example.com,9876543210,2024-03-05,1200.0,Bengaluru,560001
+Priya Sharma,priya@mail.com,9876543211,2024-03-12,2500.5,Mysore,570001
+Amit Kumar,amit@example.com,,2024-03-15,,Hubli,580020
+Ravi Nair,ravi@example,9123456780,2024-03-20,900.0,Bengaluru,560034
+Meena Iyer,meena@example.com,12345,,-300.0,,0560002
